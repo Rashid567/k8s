@@ -1,0 +1,33 @@
+apiVersion: apps/v1  # Which version of the Kubernetes API you're using to create this object
+kind: Deployment  # What kind of object you want to create
+metadata:  # Data that helps uniquely identify the object, including a name string, UID, and optional namespace
+  name: nginx  # Unique in namespace regex=[a-z0-9-]{63}
+  namespace: test  # Which namespace the object should be attached to
+  labels:  # Labels are key/value pairs that are attached to objects, such as pods. Labels allow for efficient queries and watches.
+    environment: develop  # [develop|master|stage|production]
+    solution: dashboard # [common|dashboard|security]
+    app: nginx  # app_name|project_name
+    client_id: int
+    managed-by: helm  # [helm|kcms|manual]
+    created-by: helm  # [helm|kcms|manual]
+  annotations:  # Other additional information
+    imageregistry: image_url
+
+spec:  # What state you desire for the object
+  replicas: 2  # Count of created ReplicaSets/Pods
+  template:
+    metadata:
+      name: nginx
+      labels:
+        app: nginx
+    spec:  # This is the pod template
+      containers:
+        - name: nginx
+          image: nginx
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: nginx
